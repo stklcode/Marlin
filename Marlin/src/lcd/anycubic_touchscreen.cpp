@@ -604,13 +604,13 @@ void AnycubicTouchscreenClass::HandleSpecialMenu()
   || (strcasestr(currentTouchscreenSelection, SM_BACK_S) != NULL))
   {
     MMLMenu = false;
-  }
+  } 
   else if ((strcasestr(currentTouchscreenSelection, SM_FLOWMENU_L) != NULL)
   || (strcasestr(currentTouchscreenSelection, SM_FLOWMENU_S) != NULL))
   {
     SERIAL_ECHOLNPGM("Special Menu: Enter Flow Menu");
     FlowMenu = true;
-  }
+  } 
   else if ((strcasestr(currentTouchscreenSelection, SM_FLOW_UP_L) != NULL)
   || (strcasestr(currentTouchscreenSelection, SM_FLOW_UP_S) != NULL))
   {
@@ -624,7 +624,7 @@ void AnycubicTouchscreenClass::HandleSpecialMenu()
     sprintf_P(value, PSTR("M221 S%i"), currentFlowRate);
     queue.enqueue_one_now(value);
 
-  }
+  } 
   else if ((strcasestr(currentTouchscreenSelection, SM_FLOW_DN_L) != NULL)
   || (strcasestr(currentTouchscreenSelection, SM_FLOW_DN_S) != NULL))
   {
@@ -637,7 +637,7 @@ void AnycubicTouchscreenClass::HandleSpecialMenu()
     char value[30];
     sprintf_P(value, PSTR("M221 S%i"), currentFlowRate);
     queue.enqueue_one_now(value);
-  }
+  }  
   else if ((strcasestr(currentTouchscreenSelection, SM_FLOW_EXIT_L) != NULL)
   || (strcasestr(currentTouchscreenSelection, SM_FLOW_EXIT_S) != NULL))
   {
@@ -739,7 +739,7 @@ void AnycubicTouchscreenClass::PrintList()
           HARDWARE_SERIAL_PROTOCOLLNPGM(SM_BACK_S);
           HARDWARE_SERIAL_PROTOCOLLNPGM(SM_BACK_L);
           break;
-
+        
         default:
         break;
       }
@@ -748,7 +748,7 @@ void AnycubicTouchscreenClass::PrintList()
   {
     flowRateBuffer = SM_FLOW_DISP_L;
     flowRateBuffer.replace("XXX", String(currentFlowRate));
-
+    
     switch (filenumber)
     {
         case 0: // Page 1
@@ -911,12 +911,12 @@ void AnycubicTouchscreenClass::PrintList()
         // Bugfix for non-printable special characters
         // which are now replaced by underscores.
         int fileNameLen = strlen(card.longFilename);
-
+        
         // Cut off too long filenames.
         // They don't fit on the screen anyways.
         //if(fileNameLen > MAX_PRINTABLE_FILENAME_LEN)
         //  fileNameLen = MAX_PRINTABLE_FILENAME_LEN;
-
+        
         char outputString[fileNameLen];
 
         for (unsigned char i = 0; i <= fileNameLen; i++)
@@ -925,7 +925,7 @@ void AnycubicTouchscreenClass::PrintList()
           {
             outputString[i] = ' ';
           }
-          else
+          else 
           {
             outputString[i] = card.longFilename[i];
             if (!isPrintable(outputString[i]))
@@ -935,7 +935,7 @@ void AnycubicTouchscreenClass::PrintList()
           }
         }
 
-        outputString[fileNameLen] = '\0';
+        outputString[fileNameLen] = '\0';        
 
         if (card.flag.filenameIsDir)
         {
@@ -1227,11 +1227,11 @@ static boolean TFTcomment_mode = false;
 
 void AnycubicTouchscreenClass::GetCommandFromTFT()
 {
-
+  
   char *starpos = NULL;
   while( HardwareSerial.available() > 0  && TFTbuflen < TFTBUFSIZE)
-  {
-    serial3_char = HardwareSerial.read();
+  {        
+    serial3_char = HardwareSerial.read();   
     if(serial3_char == '\n' || serial3_char == '\r' || (serial3_char == ':' && TFTcomment_mode == false) || serial3_count >= (TFT_MAX_CMD_SIZE - 1) )
     {
         if(!serial3_count)
@@ -1239,7 +1239,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
             TFTcomment_mode = false; //for new command
             return;
         }
-
+    
         TFTcmdbuffer[TFTbufindw][serial3_count] = 0; //terminate string
 
         if(!TFTcomment_mode)
@@ -1255,7 +1255,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
                   byte count = 0;
                   while(TFTcmdbuffer[TFTbufindw][count] != '*') checksum = checksum^TFTcmdbuffer[TFTbufindw][count++];
                   TFTstrchr_pointer = strchr(TFTcmdbuffer[TFTbufindw], '*');
-
+            
                   if( (int)(strtod(&TFTcmdbuffer[TFTbufindw][TFTstrchr_pointer - TFTcmdbuffer[TFTbufindw] + 1], NULL)) != checksum)
                   {
                       HARDWARE_SERIAL_ERROR_START;
@@ -1286,8 +1286,8 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
               }
           }
           // -------- FINISH ERROR CORRECTION ----------
-
-
+      
+      
       if((strchr(TFTcmdbuffer[TFTbufindw], 'A') != NULL))
       {
         TFTstrchr_pointer = strchr(TFTcmdbuffer[TFTbufindw], 'A');
@@ -1388,7 +1388,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
         }
         case 8: // A8 GET SD LIST
 #ifdef SDSUPPORT
-
+          
           currentTouchscreenSelection[0] = 0;
 #if DISABLED(KNUTWURST_SPECIAL_MENU_WO_SD)
           if (!IS_SD_INSERTED())
@@ -1401,14 +1401,14 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
           {
             if (CodeSeen('S'))
               filenumber = CodeValue();
-
+              
             HARDWARE_SERIAL_PROTOCOLPGM("FN "); // Filelist start
             HARDWARE_SERIAL_ENTER();
             PrintList();
             HARDWARE_SERIAL_PROTOCOLPGM("END"); // Filelist stop
             HARDWARE_SERIAL_ENTER();
           }
-
+    
 #endif
           break;
         case 9: // A9 pause sd print
@@ -1474,7 +1474,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
           if ((TFTstate != ANYCUBIC_TFT_STATE_SDOUTAGE))
           {
             starpos = (strchr(TFTstrchr_pointer + 4, '*'));
-
+            
             if (TFTstrchr_pointer[4] == '/')
             {
               strcpy(currentTouchscreenSelection, TFTstrchr_pointer + 5);
@@ -1545,7 +1545,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
           {
             if (card.isFileOpen())
               FlagResumFromOutage = true;
-
+            
             ResumingFlag = 1;
             card.startFileprint();
             starttime = millis();
@@ -1554,7 +1554,7 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
           HARDWARE_SERIAL_ENTER();
 #endif
           break;
-        case 16: // A16 set hotend temp
+        case 16: // A16 set hotend temp 
         {
           unsigned int tempvalue;
           if (CodeSeen('S'))
@@ -1823,21 +1823,317 @@ void AnycubicTouchscreenClass::GetCommandFromTFT()
           HARDWARE_SERIAL_ENTER();
         }
         break;
+
+/*
+ * The following section is completely untested and
+ * does not work at this time. I's only used to help
+ * me adding the leveling features for the Anycubic
+ * Chiron printer.
+ */
+#if ENABLED(KNUTWURST_CHRIRON)
+
+        #ifdef AUTO_BED_LEVELING_BILINEAR 
+        case 29:   //A29 bed grid read
+                  {   
+        unsigned char temp_x=0,temp_y=0;                       
+        if(CodeSeen('X'))temp_x=CodeValue();
+        if(CodeSeen('Y'))temp_y=CodeValue();
+        float Zvalue=bed_level_grid[temp_x][temp_y];
+        Zvalue=Zvalue*100;
+        HARDWARE_SERIAL_PROTOCOLPGM("A29V ");
+        HARDWARE_SERIAL_PROTOCOL(Zvalue);                            
+        HARDWARE_SERIAL_ENTER();                          
+        }
+        break;                         
+        
+        case 30://a30 auto leveling
+        {    
+            
+        if((planner.movesplanned())||(card.sdprinting)) 
+        {
+          HARDWARE_SERIAL_PROTOCOLPGM("J24");// forbid auto leveling
+          HARDWARE_SERIAL_ENTER();                          
+        }
+        if(CodeSeen('S') )
+        {
+            Manual_Leveling=0x55;
+            enqueue_and_echo_commands_P(PSTR("G28\nG29"));
+        }                      
+      }
+      break;
+      case 31: //a31 zoffset set get or save
+      {
+          if(Manual_Leveling==0xaa)break;
+          if(CodeSeen('S'))
+          {           
+            float value=constrain(CodeValue(),-1.0,1.0);
+            NEW_zprobe_zoffset+=value;         
+          for (uint8_t x = 0; x < ABL_GRID_POINTS_X; x++)
+          {
+            for (uint8_t y = 0; y < ABL_GRID_POINTS_Y; y++)
+              bed_level_grid[x][y] += value; 
+          }
+              HARDWARE_SERIAL_PROTOCOLPGM("A31V ");
+              HARDWARE_SERIAL_PROTOCOL(NEW_zprobe_zoffset);
+              HARDWARE_SERIAL_ENTER();             
+          } 
+          if(CodeSeen('G')) {HARDWARE_SERIAL_PROTOCOLPGM("A31V ");HARDWARE_SERIAL_PROTOCOL(NEW_zprobe_zoffset); HARDWARE_SERIAL_ENTER(); }
+          if(CodeSeen('D')) SaveAutoBedGridData();
+  
+      }
+      HARDWARE_SERIAL_ENTER();                      
+      break;
+      #endif
+
+      case 32:  //a32 clean leveling beep flag
+      //   {                           
+        //       PointTestFlag=0;
+      //    }
+                         
+
+      #ifdef AUTO_BED_LEVELING_BILINEAR
+        case 34: //a34 bed grid write
+        {
+          uint8_t x_array=0,y_array=0,result=0;     
+          if(Manual_Leveling==0xaa) break;                       
+          if(CodeSeen('X')) x_array=constrain(CodeValue(),0,ABL_GRID_POINTS_X);
+          if(CodeSeen('Y')) y_array=constrain(CodeValue(),0,ABL_GRID_POINTS_Y);                             
+          if(CodeSeen('V')) {float i=constrain(CodeValue()/100,-10,10); bed_level_grid[x_array][y_array] = i;} 
+          if(CodeSeen('S')) SaveAutoBedGridData();    
+          if(CodeSeen('C')) ReadAutoBedGridData();     // if click return(didn't choose save),needs restore bed grid data.                      
+        }
+        break;
+          
+        case 35:{                   //RESET AUTOBED DATE //M1000
+                float temp;
+                if(code_seen('S')) temp=code_value_float();
+                else temp=-3.5;
+                for (uint8_t x = 0; x < ABL_GRID_POINTS_X; x++)
+                {
+                  for (uint8_t y = 0; y < ABL_GRID_POINTS_Y; y++)
+                    bed_level_grid[x][y] =temp; 
+                };
+                bilinear_grid_spacing[0]=int((RIGHT_PROBE_BED_POSITION-LEFT_PROBE_BED_POSITION)/(ABL_GRID_POINTS_X-1));
+                bilinear_grid_spacing[1]=int((BACK_PROBE_BED_POSITION-FRONT_PROBE_BED_POSITION)/(ABL_GRID_POINTS_Y-1));
+                bilinear_start[0]=LEFT_PROBE_BED_POSITION;
+                bilinear_start[1]=FRONT_PROBE_BED_POSITION;
+                zprobe_zoffset = Z_PROBE_OFFSET_FROM_EXTRUDER;
+                NEW_zprobe_zoffset=Z_PROBE_OFFSET_FROM_EXTRUDER;
+                Manual_Leveling=0xaa;
+                SaveWay2Leveling();
+                SaveAutoBedGridData();
+                SERIAL_ECHOPGM("Done, Manual Leveling was actived!");
+          HARDWARE_SERIAL_ENTER();
+              }
+              break;
+
+        case 36:// a36 M1001  
+        {        
+            if((planner.movesplanned())||(card.sdprinting)) //forbit auto leveling when the printer is moving
+                      {
+                        HARDWARE_SERIAL_PROTOCOLPGM("J24");// forbid auto leveling
+                        HARDWARE_SERIAL_ENTER(); 
+                        HARDWARE_SERIAL_PROTOCOLLN("J24");
+              break;
+                      }
+
+                    do_blocking_move_to_z(50.0,30); 
+              if(Manual_Leveling!=0x55)
+              {
+                    for (uint8_t x = 0; x < ABL_GRID_POINTS_X; x++)
+                    {
+                      for (uint8_t y = 0; y < ABL_GRID_POINTS_Y; y++)
+                        bed_level_grid[x][y] =-0.1; 
+                    };
+                  bilinear_grid_spacing[0]=int((RIGHT_PROBE_BED_POSITION-LEFT_PROBE_BED_POSITION)/(ABL_GRID_POINTS_X-1));
+                  bilinear_grid_spacing[1]=int((BACK_PROBE_BED_POSITION-FRONT_PROBE_BED_POSITION)/(ABL_GRID_POINTS_Y-1));
+                  bilinear_start[0]=LEFT_PROBE_BED_POSITION;
+                  bilinear_start[1]=FRONT_PROBE_BED_POSITION;
+                  zprobe_zoffset = Z_PROBE_OFFSET_FROM_EXTRUDER;
+                  NEW_zprobe_zoffset=Z_PROBE_OFFSET_FROM_EXTRUDER;
+                  Manual_Leveling=0x55;
+                  SaveWay2Leveling();
+                  SaveAutoBedGridData();  
+                  SERIAL_ECHOPGM("Done, Auto Leveling was actived!");  
+            HARDWARE_SERIAL_ENTER();
+              }
+
+                                    
+            HARDWARE_SERIAL_PROTOCOLPGM("J26");//start auto leveling
+            HARDWARE_SERIAL_ENTER();  
+            HARDWARE_SERIAL_PROTOCOLLN("J26");
+
+          }
+        break;
+      #endif
+  #endif
+
+
+#if ENABLED(KNUTWURST_MEGA_P_LASER)
+            case 34:// Continuous printing ʹ��������ӡ,Ҫ��һЩ׼����������ͷ�½�
+                         {
+                            en_continue = 1 ;}
+                         
+						  break;
+						  case 35:// Continuous printing ʧ��������ӡ
+                         {
+                            en_continue = 0 ;}
+                         
+                         break;
+						  
+                         case 36://A36 λͼ ����ʸ��ͼ
+						  if(CodeSeen('S'))
+                         {
+                          int coorvalue;
+                          coorvalue=CodeValueInt();
+						  if(coorvalue!=0)
+						  Laser_printer_st.pic_vector = 1; //��ʸ��ͼ
+						  else
+						  Laser_printer_st.pic_vector = 0;//��λͼ
+						  	
+                         }
+						  case 37:
+						  if(CodeSeen('S'))//X������
+                         {
+                          int coorvalue;
+                          coorvalue=CodeValueInt();
+						  if(coorvalue == 0)
+						  Laser_printer_st.pic_x_mirror = 0;
+						  else if(coorvalue == 1)
+						  Laser_printer_st.pic_x_mirror = 1; //x����			  
+                         }
+                         	
+						  break;
+						  case 38:
+                         if(CodeSeen('S'))//A38 ��������ʱ��
+                         {
+                          int coorvalue;
+                          coorvalue=CodeValueInt();
+						  Laser_printer_st.pic_laser_time = coorvalue;
+                         }
+                         	
+						  break;
+
+						 case 39:
+                         if(CodeSeen('S'))//A39
+                         {
+                          float coorvalue;
+                          coorvalue=CodeValue();
+						  Laser_printer_st.laser_height = coorvalue;
+						  HARDWARE_SERIAL_PROTOCOL("laser_height = ") ;
+						  HARDWARE_SERIAL_PROTOCOLLN(Laser_printer_st.laser_height) ;
+						  
+						 } 
+ 
+						 break;
+						  case 40:
+                         if(CodeSeen('S'))//A40 
+                         {
+                          float coorvalue;
+                          coorvalue=CodeValue();
+						  Laser_printer_st.pic_pixel_distance = coorvalue;
+                         }
+                         
+						  break;
+						  case 41:
+                            if(CodeSeen('S'))//
+                         {
+                          float coorvalue;
+                          coorvalue=CodeValue();
+						  Laser_printer_st.x_offset = coorvalue;
+                         }
+                                               
+						  break;
+						  case 42:
+                           if(CodeSeen('S'))//
+                         {
+                          float coorvalue;
+                          coorvalue=CodeValue();
+						  Laser_printer_st.y_offset = coorvalue;
+                         }
+                                                
+						  break;
+						  case 43:
+                         if(CodeSeen('S'))//y
+                         {
+                          int coorvalue;
+                          coorvalue=CodeValueInt();
+						  if(coorvalue == 0)
+						  Laser_printer_st.pic_y_mirror = 0;
+						  else if(coorvalue == 1)
+						  Laser_printer_st.pic_y_mirror = 1; //
+						  				  
+                         }
+						  break;
+						  case 44:
+                          send_laser_param();//
+						  break;
+
+						   case 49:// A49
+						  {
+						     laser_on_off = 0;
+                             WRITE(HEATER_0_PIN, 0);
+						  }
+						   break;
+
+						  case 50:// A50
+						  {
+						   if( laser_on_off == 0)
+						   	 laser_on_off = 1;
+						   	 else
+							 { laser_on_off = 0;
+                               WRITE(HEATER_0_PIN, 0);
+   							}
+						 
+						  }
+						   
+						  break;
+						 case 51:// A51�Զ���ƽ
+						  {
+						     if(CodeSeen('H'))//��һ��
+                            {
+                             enqueue_and_echo_commands_P(PSTR("G1 Z5 F500")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 X30 Y30 F5000")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 Z0.15 F300")); 
+						    }
+							 else if(CodeSeen('I'))//�ڶ���
+                            {
+                              enqueue_and_echo_commands_P(PSTR("G1 Z5 F500")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 X190 Y30 F5000")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 Z0.15 F300")); 
+						    }
+							  else if(CodeSeen('J'))//������
+                            {
+                              enqueue_and_echo_commands_P(PSTR("G1 Z5 F500")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 X190 Y190 F5000")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 Z0.15 F300"));                            
+						    }
+							   else if(CodeSeen('K'))//���Ĳ�
+                            {
+                              enqueue_and_echo_commands_P(PSTR("G1 Z5 F500")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 X30 Y190 F5000")); 
+							 enqueue_and_echo_commands_P(PSTR("G1 Z0.15 F300"));                            
+						    }
+							 else if(CodeSeen('L'))//���Ĳ�
+                            {
+							 enqueue_and_echo_commands_P(PSTR("G1 X100 Y100  Z50 F5000"));  //�ص�����λ��                           
+						    }
+						  }
+						  break;
+#endif
         default:
           break;
-      }
-       }
-       TFTbufindw = (TFTbufindw + 1)%TFTBUFSIZE;
-       TFTbuflen += 1;
-     }
-     serial3_count = 0; //clear buffer
-     }
-     else
-     {
-     if(serial3_char == ';') TFTcomment_mode = true;
-     if(!TFTcomment_mode) TFTcmdbuffer[TFTbufindw][serial3_count++] = serial3_char;
-     }
-   }
+        }   
+      }       
+      TFTbufindw = (TFTbufindw + 1)%TFTBUFSIZE;
+      TFTbuflen += 1;
+    }
+    serial3_count = 0; //clear buffer
+    } else {
+      if(serial3_char == ';') TFTcomment_mode = true;
+      if(!TFTcomment_mode) TFTcmdbuffer[TFTbufindw][serial3_count++] = serial3_char;
+    }     
+  }
 }
 
 
