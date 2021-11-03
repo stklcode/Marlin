@@ -65,18 +65,6 @@
 #endif
 
 /*
- * This enables the integrated Laser engaving feature
- * in the anycubic touchscreen. It's currently only
- * supported by the Anycubic MEGA Pro and therefore it
- * is automatically set if the MEGA_P is enabled.
- *
- */
-#if ENABLED(KNUTWURST_MEGA_P)
-// #define KNUTWURST_MEGA_P_LASER
-#endif
-
-
-/*
  * This enables the integrated leveling features
  * in the anycubic touchscreen. It's currently only
  * supported by the Anycubic Chiron and therefore it

@@ -299,6 +299,7 @@ bool IsParked             = false;
 int currentFlowRate       = 0;
 bool PrintdoneAndPowerOFF = true;
 bool powerOFFflag         = 0;
+void TFTCommandScan();
 
 static AnycubicMediaPrintState mediaPrintingState;
 static AnycubicMediaPauseState mediaPauseState;
@@ -346,7 +347,7 @@ uint8_t BLTouchMenu = false;
 uint8_t LevelMenu   = false;
 uint8_t CaseLight   = true;
 
-#if ENABLED(KNUTWURST_MEGA_P_LASER)
+#if ENABLED(KNUTWURST_MEGA_P)
   typedef struct {
     unsigned char bfType[2];
     unsigned char bfSize[4];
@@ -376,12 +377,12 @@ uint8_t CaseLight   = true;
     float x_offset;
     float y_offset;
 
-    unsigned int pic_realy_widht;
-    unsigned int pic_widht;
-    unsigned int pic_hight;
+    unsigned int pic_real_width;
+    unsigned int pic_width;
+    unsigned int pic_height;
     unsigned char pic_bit;
-    unsigned char pic_widht_odd;
-    unsigned char pic_hight_odd;
+    unsigned char pic_width_odd;
+    unsigned char pic_height_odd;
 
     unsigned char pic_print_status;
     unsigned char pic_dir;
@@ -396,8 +397,29 @@ uint8_t CaseLight   = true;
   #define PIC_OPEN  50     //  //  ms
   #define PIC_SPEDD 20000
   #define MIN_GRAY_VLAUE  20
-  #define LASER_PRINT_SPEED 30      // 50*60
-#endif // if ENABLED(KNUTWURST_MEGA_P_LASER)
+  #define LASER_PRINT_SPEED 1800    // (mm/min) Speed for laser printing
+  #define MAX_X_SIZE  220
+  #define MAX_Y_SIZE  150
+  #define LASER_X_OFFSET 0  // The distance in the X direction between the laser and the extruder
+  #define LASER_Y_OFFSET 65 // The distance in the Y direction between the laser and the extruder
+  #define LASER_INDICATE_LEVEL 5
+
+  PRINTER_STRUCT laser_printer_st = {0};
+  BMP_HEAD st_bmp                 = {0};
+  char laser_on_off               = 0;
+  char laser_status               = 0;
+  char laser_print_pause          = 0;
+  char en_continue                = 0;
+  char file_type                  = 0;
+
+  void laser_init();
+  void send_pic_param();
+  void send_laser_param();
+  void read_bmp(unsigned char*, unsigned int, unsigned int);
+  void prepare_laser_print();
+  void laser_print_picture();
+  void laser_indicate();
+#endif // if ENABLED(KNUTWURST_MEGA_P)
 };
 
 extern AnycubicTouchscreenClass AnycubicTouchscreen;
