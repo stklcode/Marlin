@@ -66,8 +66,11 @@ private:
   static int serial3_count;
   static char *TFTstrchr_pointer;
   static uint8_t SpecialMenu;
+  static uint8_t SpecialMenuSub;
   static AnycubicMediaPrintState mediaPrintingState;
   static AnycubicMediaPauseState mediaPauseState;
+
+  static uint16_t currentFlowRate;
 
   static float CodeValue();
   static bool CodeSeen(char);

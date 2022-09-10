@@ -52,6 +52,10 @@
 #define SPECIAL_MENU_FILENAME(A) A TERN_(ANYCUBIC_LCD_GCODE_EXT, ".gcode")
 #define SPECIAL_MENU_ALTNAME(A, B) TERN(ANYCUBIC_LCD_GCODE_EXT, A ".gcode", B)
 
+// Special Menu Submenus
+#define SPECIAL_MENU_ROOT     0
+#define SPECIAL_MENU_FLOWRATE 1
+
 AnycubicTFTClass AnycubicTFT;
 
 char AnycubicTFTClass::TFTcmdbuffer[TFTBUFSIZE][TFT_MAX_CMD_SIZE];
@@ -61,9 +65,12 @@ int AnycubicTFTClass::TFTbuflen = 0,
 char AnycubicTFTClass::serial3_char;
 int AnycubicTFTClass::serial3_count = 0;
 char* AnycubicTFTClass::TFTstrchr_pointer;
-uint8_t AnycubicTFTClass::SpecialMenu = false;
+uint8_t AnycubicTFTClass::SpecialMenu = false,
+        AnycubicTFTClass::SpecialMenuSub = false;
 AnycubicMediaPrintState AnycubicTFTClass::mediaPrintingState = AMPRINTSTATE_NOT_PRINTING;
 AnycubicMediaPauseState AnycubicTFTClass::mediaPauseState = AMPAUSESTATE_NOT_PAUSED;
+
+uint16_t AnycubicTFTClass::currentFlowRate = 100;
 
 char AnycubicTFTClass::SelectedDirectory[30];
 char AnycubicTFTClass::SelectedFile[FILENAME_LENGTH];
@@ -244,129 +251,168 @@ void AnycubicTFTClass::HandleSpecialMenu() {
    * NOTE: that the file selection command actual lowercases the entire selected file/foldername, so charracter comparisons need to be lowercase.
    */
   if (SelectedDirectory[0] == '<') {
-    switch (SelectedDirectory[1]) {
-      case 'e': // "<exit>"
-        SpecialMenu = false;
-        return;
-        break;
+    switch (SpecialMenuSub) {
+      case SPECIAL_MENU_FLOWRATE: // Flowrate submenu
+        switch (SelectedDirectory[1]) {
+            case 'e': // "<exit>"
+              SpecialMenuSub = SPECIAL_MENU_ROOT;
+              return;
+            case 'u': // <up>
+              SERIAL_ECHOLNPGM("Special Menu: Flow Up");
+              if (currentFlowRate < 800) {
+                currentFlowRate = currentFlowRate + 1;
+                char commandStr[10];
+                sprintf_P(commandStr, PSTR("M221 S%i"), currentFlowRate);
+                injectCommands(commandStr);
+              }
+              break;
+            case 'd': // <down>
+              SERIAL_ECHOLNPGM("Special Menu: Flow Down");
+              if (currentFlowRate > 1) {
+                currentFlowRate = currentFlowRate - 1;
+                char commandStr[10];
+                sprintf_P(commandStr, PSTR("M221 S%i"), currentFlowRate);
+                injectCommands(commandStr);
+              }
+              break;
+            default:
+              break;
+          }
+       default: // Default menu
+        switch (SelectedDirectory[1]) {
+            case 'e': // "<exit>"
+              SpecialMenu = false;
+              return;
+              break;
 
-        #if ENABLED(PROBE_MANUALLY)
-          case '0':
-            switch (SelectedDirectory[2]) {
-              case '1': // "<01ZUp0.1>"
-                SERIAL_ECHOLNPGM("Special Menu: Z Up 0.1");
-                injectCommands(F("G91\nG1 Z+0.1\nG90"));
-                break;
+              #if ENABLED(PROBE_MANUALLY)
+                  case '0':
+                    switch (SelectedDirectory[2]) {
+                      case '1': // "<01ZUp0.1>"
+                        SERIAL_ECHOLNPGM("Special Menu: Z Up 0.1");
+                        injectCommands(F("G91\nG1 Z+0.1\nG90"));
+                        break;
 
-              case '2': // "<02ZUp0.02>"
-                SERIAL_ECHOLNPGM("Special Menu: Z Up 0.02");
-                injectCommands(F("G91\nG1 Z+0.02\nG90"));
-                break;
+                      case '2': // "<02ZUp0.02>"
+                        SERIAL_ECHOLNPGM("Special Menu: Z Up 0.02");
+                        injectCommands(F("G91\nG1 Z+0.02\nG90"));
+                        break;
 
-              case '3': // "<03ZDn0.02>"
-                SERIAL_ECHOLNPGM("Special Menu: Z Down 0.02");
-                injectCommands(F("G91\nG1 Z-0.02\nG90"));
-                break;
+                      case '3': // "<03ZDn0.02>"
+                        SERIAL_ECHOLNPGM("Special Menu: Z Down 0.02");
+                        injectCommands(F("G91\nG1 Z-0.02\nG90"));
+                        break;
 
-              case '4': // "<04ZDn0.1>"
-                SERIAL_ECHOLNPGM("Special Menu: Z Down 0.1");
-                injectCommands(F("G91\nG1 Z-0.1\nG90"));
-                break;
+                      case '4': // "<04ZDn0.1>"
+                        SERIAL_ECHOLNPGM("Special Menu: Z Down 0.1");
+                        injectCommands(F("G91\nG1 Z-0.1\nG90"));
+                        break;
 
-              case '5': // "<05PrehtBed>"
-                SERIAL_ECHOLNPGM("Special Menu: Preheat Bed");
-                injectCommands(F("M140 S65"));
-                break;
+                      case '5': // "<05PrehtBed>"
+                        SERIAL_ECHOLNPGM("Special Menu: Preheat Bed");
+                        injectCommands(F("M140 S65"));
+                        break;
 
-              case '6': // "<06SMeshLvl>"
-                SERIAL_ECHOLNPGM("Special Menu: Start Mesh Leveling");
-                injectCommands(F("G29S1"));
-                break;
+                      case '6': // "<06SMeshLvl>"
+                        SERIAL_ECHOLNPGM("Special Menu: Start Mesh Leveling");
+                        injectCommands(F("G29S1"));
+                        break;
 
-              case '7': // "<07MeshNPnt>"
-                SERIAL_ECHOLNPGM("Special Menu: Next Mesh Point");
-                injectCommands(F("G29S2"));
-                break;
+                      case '7': // "<07MeshNPnt>"
+                        SERIAL_ECHOLNPGM("Special Menu: Next Mesh Point");
+                        injectCommands(F("G29S2"));
+                        break;
 
-              case '8': // "<08HtEndPID>"
-                SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotend PID");
-                // need to dwell for half a second to give the fan a chance to start before the pid tuning starts
-                injectCommands(F("M106 S204\nG4 P500\nM303 E0 S215 C15 U1"));
-                break;
+                      case '8': // "<08HtEndPID>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotend PID");
+                        // need to dwell for half a second to give the fan a chance to start before the pid tuning starts
+                        injectCommands(F("M106 S204\nG4 P500\nM303 E0 S215 C15 U1"));
+                        break;
 
-              case '9': // "<09HtBedPID>"
-                SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotbed Pid");
-                injectCommands(F("M303 E-1 S65 C6 U1"));
-                break;
+                      case '9': // "<09HtBedPID>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotbed Pid");
+                        injectCommands(F("M303 E-1 S65 C6 U1"));
+                        break;
 
-              default:
-                break;
-            }
-            break;
+                      default:
+                        break;
+                    }
+                    break;
 
-          case '1':
-            switch (SelectedDirectory[2]) {
-              case '0': // "<10FWDeflts>"
-                SERIAL_ECHOLNPGM("Special Menu: Load FW Defaults");
-                injectCommands(F("M502\nM300 P105 S1661\nM300 P210 S1108"));
-                break;
+                  case '1':
+                    switch (SelectedDirectory[2]) {
+                      case '0': // "<10SetFlowrt>"
+                        SERIAL_ECHOLNPGM("Special Menu: Set Flowrate");
+                        SpecialMenuSub = SPECIAL_MENU_FLOWRATE;
+                        break;
 
-              case '1': // "<11SvEEPROM>"
-                SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
-                injectCommands(F("M500\nM300 P105 S1108\nM300 P210 S1661"));
-                break;
+                      case '1': // "<11FWDeflts>"
+                        SERIAL_ECHOLNPGM("Special Menu: Load FW Defaults");
+                        injectCommands(F("M502\nM300 P105 S1661\nM300 P210 S1108"));
+                        break;
 
-              default:
-                break;
-            }
-            break;
-        #else // if ENABLED(PROBE_MANUALLY)
-          case '0':
-            switch (SelectedDirectory[2]) {
-              case '1': // "<01PrehtBed>"
-                SERIAL_ECHOLNPGM("Special Menu: Preheat Bed");
-                injectCommands(F("M140 S65"));
-                break;
+                      case '2': // "<12SvEEPROM>"
+                        SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
+                        injectCommands(F("M500\nM300 P105 S1108\nM300 P210 S1661"));
+                        break;
 
-              case '2': // "<02ABL>"
-                SERIAL_ECHOLNPGM("Special Menu: Auto Bed Leveling");
-                injectCommands(F("G29N"));
-                break;
+                      default:
+                        break;
+                    }
+                    break;
+              #else // if ENABLED(PROBE_MANUALLY)
+                  case '0':
+                    switch (SelectedDirectory[2]) {
+                      case '1': // "<01PrehtBed>"
+                        SERIAL_ECHOLNPGM("Special Menu: Preheat Bed");
+                        injectCommands(F("M140 S65"));
+                        break;
 
-              case '3': // "<03HtendPID>"
-                SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotend PID");
-                // need to dwell for half a second to give the fan a chance to start before the pid tuning starts
-                injectCommands(F("M106 S204\nG4 P500\nM303 E0 S215 C15 U1"));
-                break;
+                      case '2': // "<02ABL>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Bed Leveling");
+                        injectCommands(F("G29N"));
+                        break;
 
-              case '4': // "<04HtbedPID>"
-                SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotbed Pid");
-                injectCommands(F("M303 E-1 S65 C6 U1"));
-                break;
+                      case '3': // "<03HtendPID>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotend PID");
+                        // need to dwell for half a second to give the fan a chance to start before the pid tuning starts
+                        injectCommands(F("M106 S204\nG4 P500\nM303 E0 S215 C15 U1"));
+                        break;
 
-              case '5': // "<05FWDeflts>"
-                SERIAL_ECHOLNPGM("Special Menu: Load FW Defaults");
-                injectCommands(F("M502\nM300 P105 S1661\nM300 P210 S1108"));
-                break;
+                      case '4': // "<04HtbedPID>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Tune Hotbed Pid");
+                        injectCommands(F("M303 E-1 S65 C6 U1"));
+                        break;
 
-              case '6': // "<06SvEEPROM>"
-                SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
-                injectCommands(F("M500\nM300 P105 S1108\nM300 P210 S1661"));
-                break;
+                      case '5': // "<05SetFlowrt>"
+                        SERIAL_ECHOLNPGM("Special Menu: Set Flowrate");
+                        SpecialMenuSub = SPECIAL_MENU_FLOWRATE;
+                        break;
 
-              case '7': // <07SendM108>
-                SERIAL_ECHOLNPGM("Special Menu: Send User Confirmation");
-                injectCommands(F("M108"));
-                break;
+                      case '6': // "<06FWDeflts>"
+                        SERIAL_ECHOLNPGM("Special Menu: Load FW Defaults");
+                        injectCommands(F("M502\nM300 P105 S1661\nM300 P210 S1108"));
+                        break;
 
-              default:
-                break;
-            }
-            break;
-            #endif  // PROBE_MANUALLY
+                      case '7': // "<07SvEEPROM>"
+                        SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
+                        injectCommands(F("M500\nM300 P105 S1108\nM300 P210 S1661"));
+                        break;
 
-          default:
-            break;
+                      case '8': // <08SendM108>
+                        SERIAL_ECHOLNPGM("Special Menu: Send User Confirmation");
+                        injectCommands(F("M108"));
+                        break;
+
+                      default:
+                        break;
+                    }
+                    break;
+                    #endif  // PROBE_MANUALLY
+
+                  default:
+                    break;
+          }
     }
     #if ENABLED(ANYCUBIC_LCD_DEBUG)
   }
@@ -406,69 +452,103 @@ void AnycubicTFTClass::RenderCurrentFileList() {
 }
 
 void AnycubicTFTClass::RenderSpecialMenu(uint16_t selectedNumber) {
-  switch (selectedNumber) {
-    #if ENABLED(PROBE_MANUALLY)
-      case 0: // First Page
-        SENDLINE_PGM("<01ZUP~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Up 0.1>"));
-        SENDLINE_PGM("<02ZUP~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Up 0.02>"));
-        SENDLINE_PGM("<03ZDO~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Down 0.02>"));
-        SENDLINE_PGM("<04ZDO~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Down 0.1>"));
-        break;
+  // Submenu rendering
+  switch (SpecialMenuSub) {
+    case SPECIAL_MENU_FLOWRATE: // Flowrate submenu
+      switch (selectedNumber) {
+        case 0: // First Page
+          SENDLINE_PGM("<FLDISPL.GCO");
+          SEND_PGM("<Flow is ");
+          SEND(ui16tostr3rj(currentFlowRate));
+          SENDLINE_PGM(SPECIAL_MENU_FILENAME("%>"));
+          SENDLINE_PGM("<UPFLOW1.GCO");
+          SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Up>"));
+          SENDLINE_PGM("<DWNFLOW.GCO");
+          SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Down>"));
+          SENDLINE_PGM("<EXTFLW1.GCO");
+          SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit Flow Settings>"));
+          break;
 
-      case 4: // Second Page
-        SENDLINE_PGM("<05PRE~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Preheat Bed>"));
-        SENDLINE_PGM("<06MES~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<Mesh Leveling>", "<Start Mesh Leveling>"));
-        SENDLINE_PGM("<07NEX~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Next Mesh Point>"));
-        SENDLINE_PGM("<08PID~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<PID Tune Hotend>"));
-        break;
+        default:
+          break;
+      }
+      break;
 
-      case 8: // Third Page
-        SENDLINE_PGM("<09PID~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<PID Tune Hotbed>"));
-        SENDLINE_PGM("<10FWD~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Load FW Defaults>"));
-        SENDLINE_PGM("<11SAV~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
-        SENDLINE_PGM("<EXIT_~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit>"));
-        break;
-    #else
-      case 0: // First Page
-        SENDLINE_PGM("<01PRE~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Preheat Bed>"));
-        SENDLINE_PGM("<02ABL~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Auto Bed Leveling>"));
-        SENDLINE_PGM("<03PID~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<PID Tune Hotend>", "<Auto Tune Hotend PID>"));
-        SENDLINE_PGM("<04PID~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<PID Tune Hotbed>", "<Auto Tune Hotbed PID>"));
-        break;
+    default: // Default special menu
+      switch (selectedNumber) {
+        #if ENABLED(PROBE_MANUALLY)
+          case 0: // First Page
+            SENDLINE_PGM("<01ZUP~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Up 0.1>"));
+            SENDLINE_PGM("<02ZUP~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Up 0.02>"));
+            SENDLINE_PGM("<03ZDO~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Down 0.02>"));
+            SENDLINE_PGM("<04ZDO~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Z Down 0.1>"));
+            break;
 
-      case 4: // Second Page
-        SENDLINE_PGM("<05FWD~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Load FW Defaults>"));
-        SENDLINE_PGM("<06SAV~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
-        SENDLINE_PGM("<06SEN~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<User Confirmation>", "<Send User Confirmation>"));
-        SENDLINE_PGM("<EXIT_~1.GCO");
-        SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit>"));
-        break;
+          case 4: // Second Page
+            SENDLINE_PGM("<05PRE~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Preheat Bed>"));
+            SENDLINE_PGM("<06MES~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<Mesh Leveling>", "<Start Mesh Leveling>"));
+            SENDLINE_PGM("<07NEX~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Next Mesh Point>"));
+            SENDLINE_PGM("<08PID~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<PID Tune Hotend>"));
+            break;
+
+          case 8: // Third Page
+            SENDLINE_PGM("<09PID~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<PID Tune Hotbed>"));
+            SENDLINE_PGM("<10SET~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Set Flowrate>"));
+            SENDLINE_PGM("<11LOA~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Load FW Defaults>"));
+            SENDLINE_PGM("<12SAV~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
+            break;
+
+          case 12: // Fourth Page
+            SENDLINE_PGM("<EXIT_~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit>"));
+            break;
+        #else
+          case 0: // First Page
+            SENDLINE_PGM("<01PRE~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Preheat Bed>"));
+            SENDLINE_PGM("<02ABL~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Auto Bed Leveling>"));
+            SENDLINE_PGM("<03PID~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<PID Tune Hotend>", "<Auto Tune Hotend PID>"));
+            SENDLINE_PGM("<04PID~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<PID Tune Hotbed>", "<Auto Tune Hotbed PID>"));
+            break;
+
+          case 4: // Second Page
+            SENDLINE_PGM("<05SET~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Set Flowrate>"));
+            SENDLINE_PGM("<06FWD~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Load FW Defaults>"));
+            SENDLINE_PGM("<07SAV~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
+            SENDLINE_PGM("<08SEN~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_ALTNAME("<User Confirmation>", "<Send User Confirmation>"));
+            break;
+
+          case 8: // Third page
+            SENDLINE_PGM("<EXIT_~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit>"));
+            break;
 
         #endif // PROBE_MANUALLY
 
-      default:
-        break;
+        default:
+          break;
+      }
+    }
   }
-}
 
 void AnycubicTFTClass::RenderCurrentFolder(uint16_t selectedNumber) {
   FileList currentFileList;
