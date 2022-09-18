@@ -36,7 +36,8 @@
  * Advanced settings can be found in Configuration_adv.h
  */
 #define CONFIGURATION_H_VERSION 02010200
-#define ANYCUBIC_TOUCHSCREEN
+
+// #define ANYCUBIC_TOUCHSCREEN
 #if DISABLED(KNUTWURST_4MAXP2)
   #define ANYCUBIC_FILAMENT_RUNOUT_SENSOR
 #endif
@@ -3631,11 +3632,12 @@
 //
 // Touch-screen LCD for Anycubic printers
 //
-// #define ANYCUBIC_LCD_I3MEGA
+#define ANYCUBIC_LCD_I3MEGA
 // #define ANYCUBIC_LCD_CHIRON
 #if EITHER(ANYCUBIC_LCD_I3MEGA, ANYCUBIC_LCD_CHIRON)
   // #define ANYCUBIC_LCD_DEBUG
-  // #define ANYCUBIC_LCD_GCODE_EXT  // Add ".gcode" to menu entries for DGUS clone compatibility
+  #define ANYCUBIC_LCD_GCODE_EXT    // Add ".gcode" to menu entries for DGUS clone compatibility
+  #define LCD_SERIAL_PORT 3
 #endif
 
 //
