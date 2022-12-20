@@ -37,7 +37,6 @@
 #include "../module/planner.h"
 #include "../module/printcounter.h"
 #include "../module/temperature.h"
-#include "../core/serial.h"
 
 #if HAS_EXTRUDERS
   #include "../module/stepper.h"
@@ -289,7 +288,6 @@ bool load_filament(const_float_t slow_load_length/*=0*/, const_float_t fast_load
             ui.pause_show_message(PAUSE_MESSAGE_OPTION); // Also sets PAUSE_RESPONSE_WAIT_FOR
           #else
             pause_menu_response = PAUSE_RESPONSE_WAIT_FOR;
-            //pause_menu_response = PAUSE_RESPONSE_RESUME_PRINT; // KNUTWURST
           #endif
           while (pause_menu_response == PAUSE_RESPONSE_WAIT_FOR) idle_no_sleep();
         }
@@ -576,17 +574,6 @@ void wait_for_confirmation(const bool is_reload/*=false*/, const int8_t max_beep
       IF_DISABLED(PAUSE_REHEAT_FAST_RESUME, wait_for_user = true);
 
       nozzle_timed_out = false;
-/*
-      #ifdef ANYCUBIC_TOUCHSCREEN
-        if (AnycubicTouchscreen.ai3m_pause_state > 3) {
-          AnycubicTouchscreen.ai3m_pause_state -= 3;
-          #ifdef ANYCUBIC_TFT_DEBUG
-            SERIAL_ECHOPGM(" DEBUG: NTO - AI3M Pause State set to: ", AnycubicTouchscreen.ai3m_pause_state);
-            SERIAL_EOL();
-          #endif
-        }
-      #endif
-*/
       first_impatient_beep(max_beep_count);
     }
     idle_no_sleep();
@@ -631,7 +618,6 @@ void resume_print(const_float_t slow_load_length/*=0*/, const_float_t fast_load_
 
   // Re-enable the heaters if they timed out
   bool nozzle_timed_out = false;
-
   HOTEND_LOOP() {
     nozzle_timed_out |= thermalManager.heater_idle[e].timed_out;
     thermalManager.reset_hotend_idle_timer(e);
