@@ -31,6 +31,9 @@
 #include "../../../module/motion.h"  // for quickstop_stepper, A20 read printing speed, feedrate_percentage
 #include "../../../MarlinCore.h"     // for disable_steppers
 #include "../../../inc/MarlinConfig.h"
+#if HAS_BED_PROBE
+  #include "../../../module/probe.h" // for probe offset settings
+#endif
 
 // command sending macro's with debugging capability
 #define SEND_PGM(x)       send_P(PSTR(x))
@@ -53,8 +56,9 @@
 #define SPECIAL_MENU_ALTNAME(A, B) TERN(ANYCUBIC_LCD_GCODE_EXT, A ".gcode", B)
 
 // Special Menu Submenus
-#define SPECIAL_MENU_ROOT     0
-#define SPECIAL_MENU_FLOWRATE 1
+#define SPECIAL_MENU_ROOT      0
+#define SPECIAL_MENU_FLOWRATE  1
+#define SPECIAL_MENU_AUTOLEVEL 2
 
 AnycubicTFTClass AnycubicTFT;
 
@@ -278,7 +282,30 @@ void AnycubicTFTClass::HandleSpecialMenu() {
             default:
               break;
           }
-       default: // Default menu
+
+      #if HAS_BED_PROBE
+        case SPECIAL_MENU_AUTOLEVEL: // Auto bed leveling submenu
+          switch (SelectedDirectory[1]) {
+            case 's': // <start>
+              SERIAL_ECHOLNPGM("Special Menu: Start Auto Leveling");
+              injectCommands(F("G29N"));
+              break;
+             case 'u': // <up>
+               SERIAL_ECHOLNPGM("Special Menu: Z-Offset Up");
+               probe.offset.z += 0.01F;
+               break;
+             case 'd': // <down>
+               SERIAL_ECHOLNPGM("Special Menu: Z-Offset Down");
+               probe.offset.z -= 0.01F;
+               break;
+             case 'e': // <exit>
+               SpecialMenuSub = SPECIAL_MENU_ROOT;
+               return;
+          }
+          break;
+        #endif
+
+      default: // Default menu
         switch (SelectedDirectory[1]) {
             case 'e': // "<exit>"
               SpecialMenu = false;
@@ -346,12 +373,17 @@ void AnycubicTFTClass::HandleSpecialMenu() {
                         SpecialMenuSub = SPECIAL_MENU_FLOWRATE;
                         break;
 
-                      case '1': // "<11FWDeflts>"
+                      case '1': // "<11AutoLvl>"
+                        SERIAL_ECHOLNPGM("Special Menu: Auto Leveling");
+                        SpecialMenuSub = SPECIAL_MENU_BLTOUCH;
+                        break;
+
+                      case '2': // "<12FWDeflts>"
                         SERIAL_ECHOLNPGM("Special Menu: Load FW Defaults");
                         injectCommands(F("M502\nM300 P105 S1661\nM300 P210 S1108"));
                         break;
 
-                      case '2': // "<12SvEEPROM>"
+                      case '3': // "<13SvEEPROM>"
                         SERIAL_ECHOLNPGM("Special Menu: Save EEPROM");
                         injectCommands(F("M500\nM300 P105 S1108\nM300 P210 S1661"));
                         break;
@@ -370,7 +402,11 @@ void AnycubicTFTClass::HandleSpecialMenu() {
 
                       case '2': // "<02ABL>"
                         SERIAL_ECHOLNPGM("Special Menu: Auto Bed Leveling");
-                        injectCommands(F("G29N"));
+                        #if HAS_BED_PROBE
+                          SpecialMenuSub = SPECIAL_MENU_AUTOLEVEL;
+                        #else
+                          injectCommands(F("G29N"));
+                        #endif
                         break;
 
                       case '3': // "<03HtendPID>"
@@ -474,6 +510,33 @@ void AnycubicTFTClass::RenderSpecialMenu(uint16_t selectedNumber) {
       }
       break;
 
+      #if HAS_BED_PROBE
+        case SPECIAL_MENU_AUTOLEVEL: // Auto bed leveling submenu
+          switch (selectedNumber) {
+            case 0: // First Page
+              SENDLINE_PGM("<STRTALVL.GCO");
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Start Auto Leveling>"));
+              SENDLINE_PGM("<ZOSDISPL.GCO");
+              SEND_PGM("<Z Offset: ");
+              SEND(ftostr12ns(probe.offset.z));
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("mm>"));
+              SENDLINE_PGM("<UPZOFFS.GCO");
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Up>"));
+              SENDLINE_PGM("<DWNZOFFS.GCO");
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Down>"));
+              break;
+            case 4: // Second page
+              SENDLINE_PGM("<SVEXALVL.GCO");
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save and Exit>"));
+              SENDLINE_PGM("<EXITALVL.GCO");
+              SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit Auto Leveling>"));
+              break;
+            default:
+              break;
+          }
+          break;
+      #endif // if HAS_BED_PROBE
+
     default: // Default special menu
       switch (selectedNumber) {
         #if ENABLED(PROBE_MANUALLY)
@@ -504,13 +567,15 @@ void AnycubicTFTClass::RenderSpecialMenu(uint16_t selectedNumber) {
             SENDLINE_PGM(SPECIAL_MENU_FILENAME("<PID Tune Hotbed>"));
             SENDLINE_PGM("<10SET~1.GCO");
             SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Set Flowrate>"));
-            SENDLINE_PGM("<11LOA~1.GCO");
+            SENDLINE_PGM("<11ALVL~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Auto Leveling>"));
+            SENDLINE_PGM("<12LOA~1.GCO");
             SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Load FW Defaults>"));
-            SENDLINE_PGM("<12SAV~1.GCO");
-            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
             break;
 
           case 12: // Fourth Page
+            SENDLINE_PGM("<13SAV~1.GCO");
+            SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Save EEPROM>"));
             SENDLINE_PGM("<EXIT_~1.GCO");
             SENDLINE_PGM(SPECIAL_MENU_FILENAME("<Exit>"));
             break;
