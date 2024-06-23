@@ -35,7 +35,7 @@
  *
  * Advanced settings can be found in Configuration_adv.h
  */
-#define CONFIGURATION_H_VERSION 02010203
+#define CONFIGURATION_H_VERSION 02010204
 #define ANYCUBIC_TOUCHSCREEN
 #define KNUTWURST_SPECIAL_MENU
 // #define ANYCUBIC_TFT_DEBUG
@@ -245,28 +245,28 @@
   // #define E6_DRIVER_TYPE A4988
   // #define E7_DRIVER_TYPE A4988
 #else
-#define X_DRIVER_TYPE  A4988
-#define Y_DRIVER_TYPE  A4988
-#define Z_DRIVER_TYPE  A4988
-// #define X2_DRIVER_TYPE A4988
-// #define Y2_DRIVER_TYPE A4988
-#define Z2_DRIVER_TYPE A4988
-// #define Z3_DRIVER_TYPE A4988
-// #define Z4_DRIVER_TYPE A4988
-// #define I_DRIVER_TYPE  A4988
-// #define J_DRIVER_TYPE  A4988
-// #define K_DRIVER_TYPE  A4988
-// #define U_DRIVER_TYPE  A4988
-// #define V_DRIVER_TYPE  A4988
-// #define W_DRIVER_TYPE  A4988
-#define E0_DRIVER_TYPE A4988
-#define E1_DRIVER_TYPE A4988
-// #define E2_DRIVER_TYPE A4988
-// #define E3_DRIVER_TYPE A4988
-// #define E4_DRIVER_TYPE A4988
-// #define E5_DRIVER_TYPE A4988
-// #define E6_DRIVER_TYPE A4988
-// #define E7_DRIVER_TYPE A4988
+  #define X_DRIVER_TYPE  A4988
+  #define Y_DRIVER_TYPE  A4988
+  #define Z_DRIVER_TYPE  A4988
+  // #define X2_DRIVER_TYPE A4988
+  // #define Y2_DRIVER_TYPE A4988
+  #define Z2_DRIVER_TYPE A4988
+  // #define Z3_DRIVER_TYPE A4988
+  // #define Z4_DRIVER_TYPE A4988
+  // #define I_DRIVER_TYPE  A4988
+  // #define J_DRIVER_TYPE  A4988
+  // #define K_DRIVER_TYPE  A4988
+  // #define U_DRIVER_TYPE  A4988
+  // #define V_DRIVER_TYPE  A4988
+  // #define W_DRIVER_TYPE  A4988
+  #define E0_DRIVER_TYPE A4988
+  #define E1_DRIVER_TYPE A4988
+  // #define E2_DRIVER_TYPE A4988
+  // #define E3_DRIVER_TYPE A4988
+  // #define E4_DRIVER_TYPE A4988
+  // #define E5_DRIVER_TYPE A4988
+  // #define E6_DRIVER_TYPE A4988
+  // #define E7_DRIVER_TYPE A4988
 #endif // if ENABLED(KNUTWURST_TMC)
 
 /**
