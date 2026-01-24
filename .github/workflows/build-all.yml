@@ -105,7 +105,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install platformio
-    
+
     - uses: actions/checkout@master
 
     - name: Compile Firmware with PlatformIO
@@ -124,7 +124,7 @@ jobs:
     #     .pio/build/${{ matrix.platform }}/${{ matrix.platform }}_v*.hex
 
     - name: Archive all artifacts into one ZIP file
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v6
       with:
         name: Knuwurst-all-in-one-${{github.sha}}
         path: |
