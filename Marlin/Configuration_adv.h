@@ -3437,7 +3437,7 @@
  */
 // #define SPINDLE_FEATURE
 
-#if ENABLED(KNUTWURST_MEGA_P)
+#if ENABLED(KNUTWURST_MEGA_P_LASER)
   #define LASER_FEATURE
 
   #define SPINDLE_LASER_ENA_PIN 40  // D40 should be unused. The laser is only connected to the PWM output.

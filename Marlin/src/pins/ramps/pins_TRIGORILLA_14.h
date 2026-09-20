@@ -32,7 +32,7 @@
 // Servos
 //
 #if MB(TRIGORILLA_14_11)
-#define SERVO0_PIN                           5
+  #define SERVO0_PIN                           5
   #define SERVO1_PIN                           4
   #define SERVO2_PIN                          11
   #define SERVO3_PIN                           6
@@ -50,7 +50,7 @@
 #define FAN1_PIN                               7  // FAN1
 #define FAN2_PIN                              44  // FAN2
 #ifndef E0_AUTO_FAN_PIN
-#define E0_AUTO_FAN_PIN               FAN2_PIN
+  #define E0_AUTO_FAN_PIN               FAN2_PIN
 #endif
 
 /**
@@ -110,15 +110,16 @@
 // - TRIGORILLA_MAPPING_CHIRON
 // - TRIGORILLA_MAPPING_I3MEGA
 //
+#define CONTROLLER_FAN_PIN            FAN1_PIN
 
 //#define ANYCUBIC_4_MAX_PRO_ENDSTOPS
 #if ENABLED(ANYCUBIC_4_MAX_PRO_ENDSTOPS)
-#define X_MAX_PIN                           43  // AUX (2)
+  #define X_MAX_PIN                           43  // AUX (2)
   #define Y_STOP_PIN                          19  // Z+
 
   #define CONTROLLER_FAN_PIN            FAN1_PIN // PATCH: knutwurst
 #elif ANY(TRIGORILLA_MAPPING_CHIRON, TRIGORILLA_MAPPING_I3MEGA)
-// Chiron uses AUX header for Y and Z endstops
+  // Chiron uses AUX header for Y and Z endstops
   #define Y_STOP_PIN                          42  // AUX (1)
   #if DISABLED(KNUTWURST_ONE_Z_ENDSTOP)
     #define Z_STOP_PIN                          43  // AUX (2)
@@ -170,14 +171,14 @@
 #endif
 
 #if ANY(ANYCUBIC_LCD_CHIRON, ANYCUBIC_LCD_I3MEGA, ANYCUBIC_TOUCHSCREEN) // PATCH: knutwurst
-#ifndef BEEPER_PIN
+  #ifndef BEEPER_PIN
     #define BEEPER_PIN               EXP2_03_PIN  // Chiron Standard Adapter
   #endif
   #define SD_DETECT_PIN              EXP2_07_PIN  // Chiron Standard Adapter
 #endif
 
 #if HAS_TMC_UART
-#ifndef X_SERIAL_TX_PIN
+  #ifndef X_SERIAL_TX_PIN
     #define X_SERIAL_TX_PIN           SERVO1_PIN
   #endif
   #ifndef Y_SERIAL_TX_PIN

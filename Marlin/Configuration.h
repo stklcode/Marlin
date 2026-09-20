@@ -55,11 +55,11 @@
  * Adjust the Trigorilla pin mapping.
  */
 #if ENABLED(KNUTWURST_CHIRON)
-#define TRIGORILLA_MAPPING_CHIRON
+  #define TRIGORILLA_MAPPING_CHIRON
   #define NO_AUTO_ASSIGN_WARNING
 #else
-#define TRIGORILLA_MAPPING_I3MEGA
-#define SWAP_Z_MOTORS
+  #define TRIGORILLA_MAPPING_I3MEGA
+  #define SWAP_Z_MOTORS
 #endif
 
 /*
@@ -79,7 +79,7 @@
  * configuration for the 4MAX printer family
  */
 #if ENABLED(KNUTWURST_4MAXP2)
-#define ANYCUBIC_4_MAX_PRO_ENDSTOPS
+  #define ANYCUBIC_4_MAX_PRO_ENDSTOPS
   #define NO_AUTO_ASSIGN_WARNING
 #endif
 
@@ -224,7 +224,7 @@
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
 #if ENABLED(KNUTWURST_TMC)
-#define X_DRIVER_TYPE  TMC2208_STANDALONE
+  #define X_DRIVER_TYPE  TMC2208_STANDALONE
   #define Y_DRIVER_TYPE  TMC2208_STANDALONE
   #define Z_DRIVER_TYPE  TMC2208_STANDALONE
   // #define X2_DRIVER_TYPE A4988
@@ -482,7 +482,7 @@
  * See additional options in Configuration_adv.h.
  * :["PRUSA_MMU1", "PRUSA_MMU2", "PRUSA_MMU2S", "EXTENDABLE_EMU_MMU2", "EXTENDABLE_EMU_MMU2S"]
  */
-//#define MMU_MODEL PRUSA_MMU2
+// #define MMU_MODEL PRUSA_MMU2
 
 // @section psu control
 
@@ -1266,7 +1266,7 @@
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_P, KNUTWURST_4MAXP2)
-#define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
+  #define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #define Y_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #if BOTH(KNUTWURST_BLTOUCH, KNUTWURST_4MAXP2)
     #define Z_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
@@ -1290,7 +1290,7 @@
   #define W_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false // Set to true to invert the logic of the probe.
 #elif ENABLED(KNUTWURST_MEGA_X)
-#define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
+  #define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #define Y_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
   #define Z_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #define I_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
@@ -1310,7 +1310,7 @@
   #define W_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
   #define Z_MIN_PROBE_ENDSTOP_INVERTING false // Set to true to invert the logic of the probe.
 #elif ENABLED(KNUTWURST_CHIRON)
-#define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
+  #define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #define Y_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.
   #define Z_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
   #define I_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
@@ -1537,7 +1537,7 @@
  */
 #define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-#if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_P)
+  #if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_P)
     #define DEFAULT_XJERK  8.0
     #define DEFAULT_YJERK  8.0
     #define DEFAULT_ZJERK  0.4
@@ -1580,7 +1580,7 @@
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
-#if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_P)
+  #if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_P)
     #define JUNCTION_DEVIATION_MM 0.013 // (mm) Distance from real junction edge
   #endif
 
@@ -2118,7 +2118,7 @@
 #endif // if DISABLED(KNUTWURST_TMC)
 
 #if ENABLED(KNUTWURST_TMC)
-#if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_X)
+  #if ANY(KNUTWURST_MEGA, KNUTWURST_MEGA_S, KNUTWURST_MEGA_X)
     // Invert the stepper direction. Change (or reverse the motor connector) if an axis goes the wrong way.
     #define INVERT_X_DIR false // set to true for stock drivers or TMC2208 with reversed connectors
     #define INVERT_Y_DIR true // set to false for stock drivers or TMC2208 with reversed connectors
@@ -2288,7 +2288,7 @@
 #endif
 
 #if ENABLED(KNUTWURST_CHIRON)
-#define X_MIN_POS -10
+  #define X_MIN_POS -10
   #define Y_MIN_POS 0
   #define Z_MIN_POS 0
   #define X_BED_SIZE 400
@@ -2299,7 +2299,7 @@
 #endif
 
 #if ENABLED(KNUTWURST_4MAXP2)
-#define X_MIN_POS -6
+  #define X_MIN_POS -6
   #define Y_MIN_POS 0
   #define Z_MIN_POS 0
   #define X_BED_SIZE 270
@@ -2482,7 +2482,7 @@
  *   With an LCD controller the process is guided step-by-step.
  */
 #if EITHER(KNUTWURST_BLTOUCH, KNUTWURST_CHIRON)
-// #define AUTO_BED_LEVELING_3POINT
+  // #define AUTO_BED_LEVELING_3POINT
   // #define AUTO_BED_LEVELING_LINEAR
   #define AUTO_BED_LEVELING_BILINEAR
   // #define AUTO_BED_LEVELING_UBL
@@ -2490,7 +2490,7 @@
 #endif
 
 #if NONE(KNUTWURST_BLTOUCH, KNUTWURST_CHIRON)
-// #define AUTO_BED_LEVELING_3POINT
+  // #define AUTO_BED_LEVELING_3POINT
   // #define AUTO_BED_LEVELING_LINEAR
   // #define AUTO_BED_LEVELING_BILINEAR
   // #define AUTO_BED_LEVELING_UBL
